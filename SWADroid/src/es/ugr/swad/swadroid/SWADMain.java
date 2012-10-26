@@ -48,7 +48,7 @@ import es.ugr.swad.swadroid.modules.Courses;
 import es.ugr.swad.swadroid.modules.Messages;
 import es.ugr.swad.swadroid.modules.Notices;
 import es.ugr.swad.swadroid.modules.downloads.DownloadsManager;
-import es.ugr.swad.swadroid.modules.groups.MyGroupsManager;
+import es.ugr.swad.swadroid.modules.groups.SendMyGroups;
 import es.ugr.swad.swadroid.modules.notifications.Notifications;
 import es.ugr.swad.swadroid.modules.rollcall.Rollcall;
 import es.ugr.swad.swadroid.modules.tests.Tests;
@@ -106,15 +106,15 @@ public class SWADMain extends MenuExpandableListActivity {
 	/**
 	 * Group position inside the main menu for Evaluation group
 	 * */
-	private int EVALUATION_GROUP = 1;
+	//	private int EVALUATION_GROUP = 1;
 	/**
 	 * Group position inside the main menu for Course group
 	 * */
-	private int COURSE_GROUP = 2;
+	//	private int COURSE_GROUP = 2;
 	/**
 	 * Group position inside the main menu for Enrollment group
 	 * */
-	private int ENROLLMENT_GROUP = 3;
+	//	private int ENROLLMENT_GROUP = 3;
 	/**
 	 * Group position inside the main menu for User group
 	 * */
@@ -122,11 +122,11 @@ public class SWADMain extends MenuExpandableListActivity {
 	/**
 	 * Child position inside the messages menu for Notification
 	 * */
-	private int NOTIFICATION_CHILD = 0;
+	//	private int NOTIFICATION_CHILD = 0;
 	/**
 	 * Child position inside the messages menu for Send message
 	 * */
-	private int SEND_MESSAGES_CHILD = 1;
+	//	private int SEND_MESSAGES_CHILD = 1;
 	/**
 	 * Child position inside the messages menu for Publish Note
 	 * */
@@ -134,24 +134,25 @@ public class SWADMain extends MenuExpandableListActivity {
 	/**
 	 * Child position inside the evaluation menu for Tests
 	 * */
-	private int TESTS_CHILD = 0;
+	//	private int TESTS_CHILD = 0;
 	/**
 	 * Child position inside the course menu for Documents
 	 * */
-	private int DOCUMENTS_CHILD = 0;
+	//	private int DOCUMENTS_CHILD = 0;
 	/**
 	 * Child position inside the course menu for Shared area
 	 * */
-	private int SHARED_AREA_CHILD = 1;
+	//	private int SHARED_AREA_CHILD = 1;
 	/**
 	 * Child position inside the users menu for Rollcall
 	 * */
-	private int ROLLCALL_CHILD = 0;
+	//	private int ROLLCALL_CHILD = 0;
 	/**
 	 * Child position inside the enrollment menu for My Groups
 	 * */
-	private int MYGROUPS_CHILD = 0;
+	//	private int MYGROUPS_CHILD = 0;
 
+	private boolean dBCleaned = false;
 	/**
 	 * Gets the database helper
 	 * @return the database helper
@@ -215,7 +216,7 @@ public class SWADMain extends MenuExpandableListActivity {
 			activity = new Intent(getBaseContext(), Messages.class);
 			activity.putExtra("notificationCode", Long.valueOf(0));
 			startActivityForResult(activity, Global.MESSAGES_REQUEST_CODE);
-		} else if(keyword.equals(getString(R.string.noticesModuleLabel))){
+		} else if(keyword.equals(getString(R.string.noticesModuleLabel))) {
 			activity = new Intent(getBaseContext(), Notices.class);
 			startActivityForResult(activity, Global.NOTICES_REQUEST_CODE);
 		} else if(keyword.equals(getString(R.string.rollcallModuleLabel))) {
@@ -227,20 +228,25 @@ public class SWADMain extends MenuExpandableListActivity {
 				//If Android version < 2.2 show error message
 				error(getString(R.string.froyoFunctionMsg) + "\n(actual: " + android.os.Build.VERSION.RELEASE + ")");
 			}
-		} else if(keyword.equals(getString(R.string.documentsDownloadModuleLabel))){
+		} else if(keyword.equals(getString(R.string.documentsDownloadModuleLabel))) {
 			activity = new Intent(getBaseContext(), DownloadsManager.class);
 			activity.putExtra("downloadsAreaCode", Global.DOCUMENTS_AREA_CODE);
 			startActivityForResult(activity,Global.DOWNLOADSMANAGER_REQUEST_CODE);
-		} else if(keyword.equals(getString(R.string.sharedsDownloadModuleLabel))){
+		} else if(keyword.equals(getString(R.string.sharedsDownloadModuleLabel))) {
 			activity = new Intent(getBaseContext(), DownloadsManager.class);
 			activity.putExtra("downloadsAreaCode", Global.SHARE_AREA_CODE);
 			startActivityForResult(activity,Global.DOWNLOADSMANAGER_REQUEST_CODE);
 			/*activity = new Intent(getBaseContext(),DirectoryTreeDownload.class);
 			activity.putExtra("treeCode",Global.SHARE_AREA_CODE);
 			startActivityForResult(activity,Global.DIRECTORY_TREE_REQUEST_CODE);*/
-		} else if(keyword.equals(getString(R.string.myGroupsModuleLabel))){
-			activity = new Intent(getBaseContext(), MyGroupsManager.class);
-			startActivityForResult(activity,Global.MYGROUPSMANAGER_REQUEST_CODE);
+		} else if(keyword.equals(getString(R.string.myGroupsModuleLabel))) {
+			String myGroups = "";
+			activity = new  Intent(getBaseContext(), SendMyGroups.class);
+			activity.putExtra("courseCode", Global.getSelectedCourseCode());
+			activity.putExtra("myGroups", myGroups);
+			startActivityForResult(activity,Global.SENDMYGROUPS_REQUEST_CODE);
+			//	activity = new Intent(getBaseContext(), MyGroupsManager.class);
+			//	startActivityForResult(activity,Global.MYGROUPSMANAGER_REQUEST_CODE);
 		}
 
 		return true;
@@ -253,16 +259,6 @@ public class SWADMain extends MenuExpandableListActivity {
 	protected void onStart() {
 		super.onStart();
 		prefs.getPreferences(getBaseContext());
-		if(!Global.isPreferencesChanged()){
-			createSpinnerAdapter();
-			if(!firstRun){
-				courseCode = Global.getSelectedCourseCode();
-				createMenu();
-			}
-		}else{
-			getCurrentCourses();
-			Global.setPreferencesChanged(false);
-		}
 	}
 
 	/* (non-Javadoc)
@@ -297,10 +293,10 @@ public class SWADMain extends MenuExpandableListActivity {
 			SecureConnection.initSecureConnection();
 
 			//Check if this is the first run after an install or upgrade
-			// 	lastVersion = prefs.getLastVersion();
-			//	currentVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
-			lastVersion = 41;
-			currentVersion = 42;
+			lastVersion = prefs.getLastVersion();
+			currentVersion = getPackageManager().getPackageInfo(getPackageName(), 0).versionCode;
+			//lastVersion = 41;
+			//currentVersion = 42;
 
 			//If this is the first run, show configuration dialog
 			if(lastVersion == 0) {
@@ -331,8 +327,6 @@ public class SWADMain extends MenuExpandableListActivity {
 
 				prefs.setLastVersion(currentVersion);
 			}
-			Cursor dbCursor = db.getDB().query(Global.DB_TABLE_COURSES, null, null, null, null, null, null);
-			String [] columnNames = dbCursor.getColumnNames();
 
 			listCourses = dbHelper.getAllRows(Global.DB_TABLE_COURSES,"","shortName");
 			if(listCourses.size() >0){
@@ -374,59 +368,49 @@ public class SWADMain extends MenuExpandableListActivity {
 
 	private void createSpinnerAdapter() {
 		Spinner spinner = (Spinner) this.findViewById(R.id.spinner);
-		listCourses = dbHelper.getAllRows(Global.DB_TABLE_COURSES, null, "shortName");
-		Cursor dbCursorColum = db.getDB().query(Global.DB_TABLE_GROUPS, null, null, null, null, null, null);;
-		dbCursor =  dbHelper.getDb().getCursor(Global.DB_TABLE_COURSES, null, "shortName");
+		listCourses = dbHelper.getAllRows(Global.DB_TABLE_COURSES, null, "fullName");
+		dbCursor =  dbHelper.getDb().getCursor(Global.DB_TABLE_COURSES, null, "fullName");
 		startManagingCursor(dbCursor);
 		if(listCourses.size() != 0) {
 			SimpleCursorAdapter adapter = new SimpleCursorAdapter (this,
 					android.R.layout.simple_spinner_item, 
 					dbCursor, 
-					new String[]{"shortName"}, 
-					new int[]{android.R.id.text1});
-			/*			listCourses = dbHelper.getAllRows(Global.DB_TABLE_COURSES, null, "name");
-			dbCursor =  dbHelper.getDb().getCursor(Global.DB_TABLE_COURSES, null, "name");
-			startManagingCursor(dbCursor);
-			if(listCourses.size() != 0){
-				SimpleCursorAdapter adapter = new SimpleCursorAdapter (this,
-						android.R.layout.simple_spinner_item, 
-						dbCursor, 
-						new String[]{"name"}, 
-						new int[]{android.R.id.text1});	*/
+					new String[] { "fullName" }, 
+					new int[] {android.R.id.text1}
+					);
+
 			adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 			spinner.setAdapter(adapter);
 			spinner.setOnItemSelectedListener(new onItemSelectedListener());
-			if(Global.getSelectedCourseCode() != -1) {
-				boolean found = false;
-				int i = 0;
-				while (!found && i < listCourses.size()) {
-					if (listCourses.get(i).getId() == Global.getSelectedCourseCode()) {
-						found = true;
-					} else {
-						++i;
-					}
-				}
-				if (i < listCourses.size())
-					spinner.setSelection(i);
-			}
+			spinner.setSelection(prefs.getLastCourseSelected());
+			spinner.setOnTouchListener(Spinner_OnTouch);
 		} else {
-			ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, new String[]{getString(R.string.clickToGetCourses)});
-			spinner.setAdapter(adapter);
+			cleanSpinner();
 		}
+
+	}
+	/**
+	 * Create an empty spinner. It is called when the database is cleaned.
+	 * */
+	private void cleanSpinner(){
+		Spinner spinner = (Spinner) this.findViewById(R.id.spinner);
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, new String[]{getString(R.string.clickToGetCourses)});
+		spinner.setAdapter(adapter);
 		spinner.setOnTouchListener(Spinner_OnTouch);
 	}
 
 	private class onItemSelectedListener implements OnItemSelectedListener{
 		@Override
-		public void onItemSelected(AdapterView<?> parent, View view, int position,
-				long id) {
-			prefs.setLastCourseSelected(position);
-			Course courseSelected = (Course)listCourses.get(position);
-			courseCode = courseSelected.getId();
-			Global.setSelectedCourseCode(courseCode);
-			Global.setSelectedCourseShortName(courseSelected.getShortName());
-			Global.setSelectedCourseFullName(courseSelected.getFullName());
-			createMenu();
+		public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+			if(!listCourses.isEmpty()) {
+				prefs.setLastCourseSelected(position);
+				Course courseSelected = (Course)listCourses.get(position);
+				courseCode = courseSelected.getId();
+				Global.setSelectedCourseCode(courseCode);
+				Global.setSelectedCourseShortName(courseSelected.getShortName());
+				Global.setSelectedCourseFullName(courseSelected.getFullName());
+				createMenu();
+			}
 		}
 
 		@Override
@@ -459,38 +443,61 @@ public class SWADMain extends MenuExpandableListActivity {
 		startActivityForResult(activity, Global.COURSES_REQUEST_CODE);
 	}
 
-	private void createMenu(){
-		if(listCourses.size() != 0){
+	private void createMenu() {
+		if(listCourses.size() != 0) {
 			Course courseSelected;
-			if(Global.getSelectedCourseCode()!=-1){
-				String where = "id="+String.valueOf(Global.getSelectedCourseCode());
+			if(Global.getSelectedCourseCode() !=- 1) {
+				String where = "id=" + String.valueOf(Global.getSelectedCourseCode());
 				courseSelected = (Course) dbHelper.getAllRows(Global.DB_TABLE_COURSES, where, "shortName").get(0);
-			}else{
-				courseSelected = (Course) listCourses.get(0);
-				Global.setSelectedCourseCode(courseSelected.getId());
-				Global.setSelectedCourseShortName(courseSelected.getShortName());
-				Global.setSelectedCourseFullName(courseSelected.getFullName());
-				prefs.setLastCourseSelected(0);
+			} else {
+				int lastSelected = prefs.getLastCourseSelected();
+				if(lastSelected != -1 && lastSelected < listCourses.size()) {
+					courseSelected = (Course) listCourses.get(lastSelected);
+					Global.setSelectedCourseCode(courseSelected.getId());
+					Global.setSelectedCourseShortName(courseSelected.getShortName());
+					Global.setSelectedCourseFullName(courseSelected.getFullName());
+					prefs.setLastCourseSelected(lastSelected);
+				} else {
+					courseSelected = (Course) listCourses.get(0);
+					Global.setSelectedCourseCode(courseSelected.getId());
+					Global.setSelectedCourseShortName(courseSelected.getShortName());
+					Global.setSelectedCourseFullName(courseSelected.getFullName());
+					prefs.setLastCourseSelected(0);
+				}
 			}
 
-			if(courseSelected != null){
-				if(getExpandableListAdapter() == null)
+			if(courseSelected != null) {
+				if(getExpandableListAdapter() == null || dBCleaned)
 					createBaseMenu();
 				int userRole = courseSelected.getUserRole();
 				if(userRole == Global.TEACHER_TYPE_CODE && currentRole != Global.TEACHER_TYPE_CODE) 
 					changeToTeacherMenu();
 				if(userRole == Global.STUDENT_TYPE_CODE && currentRole != Global.STUDENT_TYPE_CODE) 
 					changeToStudentMenu();
+				dBCleaned = false;
 			}
 		}
 	}
+
+	/**
+	 * Create an empty menu. It is called when the database is cleaned.
+	 * */
+	//	private void createEmptyMenu(){
+	//		ImageExpandableListAdapter adapter = (ImageExpandableListAdapter) getExpandableListAdapter();
+	//		int groups = adapter.getGroupCount();
+	//		for (int i=0; i<groups; ++i)
+	//			adapter.removeGroup(i);
+	//
+	//	}
 
 	/**
 	 * Creates base menu. The menu base is common for students and teachers.
 	 * Sets currentRole to student role
 	 * */
 	private void createBaseMenu(){
-		if(getExpandableListAdapter() == null || currentRole==-1){
+		ExpandableListView list = (ExpandableListView)this.findViewById(android.R.id.list);
+		list.setVisibility(View.VISIBLE);
+		if(getExpandableListAdapter() == null || currentRole == -1) {
 			//the menu base is equal to students menu. 
 			currentRole = Global.STUDENT_TYPE_CODE; 
 			//Construct Expandable List
@@ -621,5 +628,38 @@ public class SWADMain extends MenuExpandableListActivity {
 
 		}
 		currentRole = Global.TEACHER_TYPE_CODE;
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+
+		if(!Global.isPreferencesChanged() && !Global.isDbCleaned()) {
+			createSpinnerAdapter();
+			if(!firstRun) {
+				courseCode = Global.getSelectedCourseCode();
+				createMenu();
+			}
+		} else {
+			Global.setPreferencesChanged(false);
+			Global.setDbCleaned(false);
+			setMenuDbClean();
+		}		
+	}
+
+	/**
+	 * Creates an empty Menu and spinner when the data base is empty
+	 * */
+	protected void setMenuDbClean() {
+		Global.setDbCleaned(false);
+		Global.setSelectedCourseCode(-1);
+		Global.setSelectedCourseShortName("");
+		Global.setSelectedCourseFullName("");
+		prefs.setLastCourseSelected(-1);
+		dBCleaned = true;
+		listCourses.clear();
+		cleanSpinner();
+		ExpandableListView list = (ExpandableListView) this.findViewById(android.R.id.list);
+		list.setVisibility(View.INVISIBLE);
 	}
 }

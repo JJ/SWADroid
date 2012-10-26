@@ -12,14 +12,10 @@ import java.net.URLConnection;
 
 import org.apache.http.util.ByteArrayBuffer;
 
-import es.ugr.swad.swadroid.Global;
-
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.view.View;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+import es.ugr.swad.swadroid.Global;
 
 public class FileDownloaderAsyncTask extends AsyncTask<String,Integer,Boolean> {
 
@@ -29,7 +25,7 @@ public class FileDownloaderAsyncTask extends AsyncTask<String,Integer,Boolean> {
 	private File download_dir;
 	private URL url;
 	boolean notification = true;
-	
+
 	/**
 	 * Downloads tag name for Logcat
 	 */
@@ -43,9 +39,9 @@ public class FileDownloaderAsyncTask extends AsyncTask<String,Integer,Boolean> {
 		mNotification = new DownloadNotification(context);
 		this.notification = notification;
 	}
-	
-	
-	
+
+
+
 	@Override
 	protected void onPostExecute(Boolean result) {
 		Log.i(TAG, "onPostExecute");
@@ -60,9 +56,9 @@ public class FileDownloaderAsyncTask extends AsyncTask<String,Integer,Boolean> {
 	@Override
 	protected void onPreExecute() {
 		super.onPreExecute();
-		
 
-/*		fileName.setVisibility(View.VISIBLE);
+
+		/*		fileName.setVisibility(View.VISIBLE);
 		progressBar.setVisibility(View.VISIBLE);
 		progressBar.setProgress(0);
 		progressBar.setMax(100);*/
@@ -85,8 +81,8 @@ public class FileDownloaderAsyncTask extends AsyncTask<String,Integer,Boolean> {
 	 * params[1] - url of file to download
 	 * */
 	protected Boolean doInBackground(String... params) {
-		
-		
+
+
 		download_dir = new File(params[0]);
 		if(!download_dir.exists()) 
 			return false;
@@ -98,17 +94,17 @@ public class FileDownloaderAsyncTask extends AsyncTask<String,Integer,Boolean> {
 			Log.i(TAG, "Incorrect URL");
 			return false;
 		}
-		
+
 		/* The downloaded file will be saved to a temporary file, whose prefix
 		 * will be the basename of the file and the suffix its extension */
 		String filename = FileDownloader.getFilenameFromURL(url.getPath());
 		//if(filename == null)
 		//	throw new FileNotFoundException("URL does not point to a file");
 
-		
+
 		mNotification.createNotification(filename);
-		
-		
+
+
 		/* Open a connection to the URL and a buffered input stream */
 		URLConnection ucon;
 		try {
@@ -129,7 +125,7 @@ public class FileDownloaderAsyncTask extends AsyncTask<String,Integer,Boolean> {
 			return false;
 		}
 		BufferedInputStream bis = new BufferedInputStream(is);
-		
+
 		/*  Read bytes to the buffer until there is nothing more to read(-1) */
 		ByteArrayBuffer baf = new ByteArrayBuffer(50);
 		int current = 0;
@@ -140,17 +136,17 @@ public class FileDownloaderAsyncTask extends AsyncTask<String,Integer,Boolean> {
 			Log.i(TAG, "Error lectura bytes");mNotification.completed();
 			e1.printStackTrace();
 		};
-		
-		
+
+
 		if(notification){
-		
+
 			int byteRead = 0;
 			int progress = 0;
 			try {
 				while ((current = bis.read()) != -1) {
 					baf.append((byte) current);
 					++byteRead;
-					int newValue = new Float(((float) byteRead*100/ (float) total)).intValue();
+					int newValue = Float.valueOf(((float) byteRead*100/ (float) total)).intValue();
 					if(newValue > progress){
 						progress = newValue;
 						publishProgress(progress);
@@ -176,34 +172,34 @@ public class FileDownloaderAsyncTask extends AsyncTask<String,Integer,Boolean> {
 				e.printStackTrace();
 				return false;
 			}
-			
+
 		}
-		
+
 		int lastSlashIndex = filename.lastIndexOf("/");
 		int lastDotIndex = filename.lastIndexOf(".");
-		
+
 		/* Avoid StringIndexOutOfBoundsException from being thrown if the
 		 * file has no extension (such as "http://www.domain.com/README" */
 		String basename = null;
-		String extension = null;
-		
+//		String extension = null;
+
 		if(lastDotIndex == -1)
 			basename  = filename.substring(lastSlashIndex + 1);
 		else {
 			basename  = filename.substring(lastSlashIndex + 1, lastDotIndex);
-			extension = filename.substring(lastDotIndex);
+//			extension = filename.substring(lastDotIndex);
 		}
-		
+
 		/* The prefix must be at least three characters long */
 		if(basename.length() < 3)
 			basename = "tmp";
-	
+
 		File output = new File(this.getDownloadDir(),filename) ;
-		
+
 		if(output.exists()){
 			output.delete();
 		}
-/*		try {
+		/*		try {
 			output = File.cre //File.createTempFile("swad48x48", ".gif",this.getDownloadDir());
 			//output = File.createTempFile(basename, extension, this.getDownloadDir());
 		} catch (IOException e) {
@@ -224,22 +220,15 @@ public class FileDownloaderAsyncTask extends AsyncTask<String,Integer,Boolean> {
 		}
 		try {
 			fos.write(baf.toByteArray());
+			fos.close();
 		} catch (IOException e) {
 			Log.i(TAG, "no se puede escribir fichero de salida");
 			e.printStackTrace();
 			return false;
-		}
-		try {
-			fos.close();
-		} catch (IOException e) {
-			Log.i(TAG, "no se puede cerrar fichero de salida");
-			e.printStackTrace();
-			return false;
-		}
-		
-		
+		}		
+
 		Log.i(TAG, "Terminado");
-		
+
 		return true;
 	}
 

@@ -48,7 +48,6 @@ import android.widget.Toast;
 import es.ugr.swad.swadroid.Global;
 import es.ugr.swad.swadroid.Preferences;
 import es.ugr.swad.swadroid.R;
-import es.ugr.swad.swadroid.model.Course;
 import es.ugr.swad.swadroid.model.Test;
 import es.ugr.swad.swadroid.model.TestAnswer;
 import es.ugr.swad.swadroid.model.TestQuestion;
@@ -115,13 +114,13 @@ public class TestsMake extends Module {
 
 		text = (TextView)this.findViewById(R.id.moduleName);
 		text.setText(R.string.testsModuleLabel);
-		
+
 		this.findViewById(R.id.courseSelectedText).setVisibility(View.VISIBLE);
 		this.findViewById(R.id.groupSpinner).setVisibility(View.GONE);
-		
+
 		text = (TextView) this.findViewById(R.id.courseSelectedText);
 		text.setText(Global.getSelectedCourseShortName());
-		
+
 	}
 
 	/**
@@ -518,7 +517,7 @@ public class TestsMake extends Module {
 			//Shows the test
 			showTest();
 		} else {
-			Toast.makeText(this, R.string.testNoQuestionsMeetsSpecifiedCriteriaMsg, Toast.LENGTH_LONG);
+			Toast.makeText(this, R.string.testNoQuestionsMeetsSpecifiedCriteriaMsg, Toast.LENGTH_LONG).show();
 			finish();
 		}
 	}
@@ -644,8 +643,8 @@ public class TestsMake extends Module {
 	 */
 	@Override
 	protected void onStart() {
-		Course c;
-		int lastCourseSelected;
+		//		Course c;
+//		int lastCourseSelected;
 
 		super.onStart();
 		prefs.getPreferences(getBaseContext());
@@ -659,7 +658,7 @@ public class TestsMake extends Module {
 
 			test = (Test) dbHelper.getRow(Global.DB_TABLE_TEST_CONFIG, "id",
 					Long.toString(Global.getSelectedCourseCode()));
-		
+
 			if(test != null) {
 				setNumQuestions();
 			} else {

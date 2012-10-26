@@ -19,13 +19,8 @@
 package es.ugr.swad.swadroid.modules.downloads;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.android.dataframework.DataFramework;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -41,21 +36,24 @@ import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.ArrayAdapter;
 import android.widget.Toast;
-import android.webkit.MimeTypeMap;
+
+import com.android.dataframework.DataFramework;
+
 import es.ugr.swad.swadroid.Global;
 import es.ugr.swad.swadroid.MenuActivity;
 import es.ugr.swad.swadroid.R;
-import es.ugr.swad.swadroid.model.Course;
 import es.ugr.swad.swadroid.model.DataBaseHelper;
 import es.ugr.swad.swadroid.model.Group;
 import es.ugr.swad.swadroid.model.GroupType;
+import es.ugr.swad.swadroid.model.Model;
+import es.ugr.swad.swadroid.modules.GroupTypes;
 import es.ugr.swad.swadroid.modules.Groups;
 
 /**
@@ -99,39 +97,39 @@ public class DownloadsManager extends MenuActivity {
 	 * Database Framework.
 	 */
 	protected static DataFramework db; 
-	
+
 	/**
 	 * List of group of the selected course to which the user belongs
 	 * */
 	private List<Group> groups;
-	
+
 	/**
 	 * Indicates if the groups has been requested
 	 * */
 	private boolean groupsRequested = false;
-	
+
 	/**
 	 * Indicates whether the refresh button was pressed
 	 * */
 	private boolean refresh = false;
-	
+
 	/**
 	 * Path to the directory where files will be located
 	 * */
 	private String directoryPath = null; 
-	
+
 	private GridView grid;
 
 	private ImageView moduleIcon = null;
 	private TextView moduleText = null;
 	private TextView currentPathText;
-	private TextView moduleCourseName = null;
-	
-	private AlertDialog fileOptions = null;
-	
+//	private TextView moduleCourseName = null;
+
+//	private AlertDialog fileOptions = null;
+
 	String chosenNodeName = null;
 	String fileName = null;
-	
+
 
 	@Override
 	protected void onStart() {
@@ -140,16 +138,24 @@ public class DownloadsManager extends MenuActivity {
 			if(navigator == null)
 				requestDirectoryTree();
 		}else{
-			Intent activity = new Intent(getBaseContext(),Groups.class);
-			startActivityForResult(activity,Global.GROUPS_REQUEST_CODE);
+			List<Model> rows = dbHelper.getAllRows(Global.DB_TABLE_GROUP_TYPES, "courseCode = " + Global.getSelectedCourseCode() , null);
+			if(rows.size() != 0){
+				Intent activity = new Intent(getBaseContext(),Groups.class);
+				activity.putExtra("courseCode", Global.getSelectedCourseCode());
+				startActivityForResult(activity,Global.GROUPS_REQUEST_CODE);
+			}else{
+				Intent activity = new Intent(getBaseContext(),GroupTypes.class);
+				activity.putExtra("courseCode",  Global.getSelectedCourseCode());
+				startActivityForResult(activity,Global.GROUPTYPES_REQUEST_CODE);
+			}
 		}
-		
+
 	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		// Initialize database
 		try {
 			db = DataFramework.getInstance();
@@ -159,40 +165,40 @@ public class DownloadsManager extends MenuActivity {
 			Log.e(ex.getClass().getSimpleName(), ex.getMessage());
 			ex.printStackTrace();
 		}
-		
+
 		setContentView(R.layout.navigation);
-		
+
 		checkMediaAvailability();
-		
+
 		downloadsAreaCode = getIntent().getIntExtra("downloadsAreaCode",
 				Global.DOCUMENTS_AREA_CODE);
-		
+
 		final CharSequence[] items = {getString(R.string.openFile) , getString(R.string.downloadFile) , getString(R.string.deleteFile) };
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(getString(R.string.fileOptions));
 		builder.setItems(items, new DialogInterface.OnClickListener() {
-		    public void onClick(DialogInterface dialog, int item) {
-		    	switch(item){
-			    	case 0:
-			    		openFileDefaultApp(directoryPath+File.separator+fileName);
-			    		break;
-			    	case 1:
-			    		createNotification(directoryPath,navigator.getURLFile(chosenNodeName));
-			    		break;
-			    	case 2:
-			    		File f =  new File(directoryPath, fileName);
-			    		if(f.exists())
-			    			f.delete();
-			    		//TODO change icon file to show the file is not downloaded	
-			    		break;
-		    		
-		    	}
-		    }
+			public void onClick(DialogInterface dialog, int item) {
+				switch(item){
+				case 0:
+					openFileDefaultApp(directoryPath+File.separator+fileName);
+					break;
+				case 1:
+					createNotification(directoryPath,navigator.getURLFile(chosenNodeName));
+					break;
+				case 2:
+					File f =  new File(directoryPath, fileName);
+					if(f.exists())
+						f.delete();
+					//TODO change icon file to show the file is not downloaded	
+					break;
+
+				}
+			}
 		});
 		final AlertDialog fileOptions = builder.create();
-		
-		
+
+
 		grid = (GridView) this.findViewById(R.id.gridview);
 		grid.setOnItemClickListener((new OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View v,
@@ -206,17 +212,17 @@ public class DownloadsManager extends MenuActivity {
 					updateView(navigator.goToSubDirectory(chosenNodeName));
 				else{ //it is a files therefore starts the download and notifies it. 
 
-					
+
 					directoryPath = getDirectoryPath();
 					File f = new File(directoryPath, fileName);
 					if(!f.exists())
 						createNotification(directoryPath,navigator.getURLFile(chosenNodeName));
 					else{
 						fileOptions.show();
-						
+
 					}					
 					//TODO activate request for notification download file when it is available 
-/*					if(downloadDone){
+					/*					if(downloadDone){
 						Intent activity;
 						activity = new Intent(getBaseContext(), NotifyDownload.class);
 						activity.putExtra("fileCode", fileCode);
@@ -224,7 +230,7 @@ public class DownloadsManager extends MenuActivity {
 						//TODO we must only wait , if a confirmation is needed
 						//startActivity(activity);
 					}*/
-					
+
 				}
 			}
 		}));
@@ -292,8 +298,13 @@ public class DownloadsManager extends MenuActivity {
 				this.loadGroupsSpinner();
 				requestDirectoryTree();
 				break;	
+			case Global.GROUPTYPES_REQUEST_CODE:	
+				Intent activity = new Intent(getBaseContext(),Groups.class);
+				activity.putExtra("courseCode", Global.getSelectedCourseCode());
+				startActivityForResult(activity,Global.GROUPS_REQUEST_CODE);
+				break;
 			}
-			
+
 		}
 	}
 
@@ -343,7 +354,7 @@ public class DownloadsManager extends MenuActivity {
 			this.findViewById(R.id.courseSelectedText).setVisibility(View.GONE);
 			Spinner groupsSpinner = (Spinner)this.findViewById(R.id.groupSpinner);
 			groupsSpinner.setVisibility(View.VISIBLE);
-			
+
 			ArrayList<String> spinnerNames = new ArrayList<String>(groups.size()+1);
 			spinnerNames.add(getString(R.string.course)+"-" + Global.getSelectedCourseShortName());
 			for(int i=0;i<groups.size();++i){
@@ -351,23 +362,23 @@ public class DownloadsManager extends MenuActivity {
 				GroupType gType = dbHelper.getGroupTypeFromGroup(g.getId());
 				spinnerNames.add(getString(R.string.group)+"-" + gType.getGroupTypeName() + " "+ g.getGroupName() );
 			}
-			
+
 			ArrayAdapter<String> adapter = new ArrayAdapter<String> (this,android.R.layout.simple_spinner_item,spinnerNames);
 			adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 			groupsSpinner.setAdapter(adapter);
 			groupsSpinner.setOnItemSelectedListener(new onItemSelectedListener());
-			
+
 		}else{
 			if(groupsRequested){ //there are not groups in the selected course, therefore only the course name should be loaded
 				this.findViewById(R.id.courseSelectedText).setVisibility(View.VISIBLE);
 				this.findViewById(R.id.groupSpinner).setVisibility(View.GONE);
-				
+
 				TextView courseNameText = (TextView) this.findViewById(R.id.courseSelectedText);
 				courseNameText.setText(Global.getSelectedCourseShortName());
 			}
 		}
 	}
-	
+
 	private class onItemSelectedListener implements OnItemSelectedListener{
 
 		@Override
@@ -389,7 +400,7 @@ public class DownloadsManager extends MenuActivity {
 		}
 
 	}
-	
+
 	private void requestDirectoryTree(){
 		Intent activity;
 		activity = new Intent(getBaseContext(), DirectoryTreeDownload.class);
@@ -397,7 +408,7 @@ public class DownloadsManager extends MenuActivity {
 		activity.putExtra("groupCode", chosenGroupCode);
 		startActivityForResult(activity, Global.DIRECTORY_TREE_REQUEST_CODE);
 	}
-	
+
 	/**
 	 * It checks if the external storage is available 
 	 * @return 0 - if external storage can not be read either wrote
@@ -406,31 +417,31 @@ public class DownloadsManager extends MenuActivity {
 	 * */
 
 	private int checkMediaAvailability(){
-		boolean mExternalStorageAvailable = false;
-		boolean mExternalStorageWriteable = false;
+//		boolean mExternalStorageAvailable = false;
+//		boolean mExternalStorageWriteable = false;
 		String state = Environment.getExternalStorageState();
 		int returnValue = 0;
 		if (Environment.MEDIA_MOUNTED.equals(state)) {
-		    // We can read and write the media
-		    mExternalStorageAvailable = mExternalStorageWriteable = true;
-		    Toast.makeText(this, "External Storage can be read and wrote", Toast.LENGTH_LONG).show();
-		    returnValue = 2;
+			// We can read and write the media
+//			mExternalStorageAvailable = mExternalStorageWriteable = true;
+			Toast.makeText(this, "External Storage can be read and wrote", Toast.LENGTH_LONG).show();
+			returnValue = 2;
 		} else if (Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
-		    // We can only read the media
-		    mExternalStorageAvailable = true;
-		    mExternalStorageWriteable = false;
-		    Toast.makeText(this,"External Storage can only be read", Toast.LENGTH_LONG).show();
-		    returnValue = 1;
+			// We can only read the media
+//			mExternalStorageAvailable = true;
+//			mExternalStorageWriteable = false;
+			Toast.makeText(this,"External Storage can only be read", Toast.LENGTH_LONG).show();
+			returnValue = 1;
 		} else {
-		    // Something else is wrong. It may be one of many other states, but all we need
-		    //  to know is we can neither read nor write
-		    mExternalStorageAvailable = mExternalStorageWriteable = false;
-		    Toast.makeText(this, "External Storage can not be read either wrote", Toast.LENGTH_LONG).show();
-		    returnValue = 0;
+			// Something else is wrong. It may be one of many other states, but all we need
+			//  to know is we can neither read nor write
+//			mExternalStorageAvailable = mExternalStorageWriteable = false;
+			Toast.makeText(this, "External Storage can not be read either wrote", Toast.LENGTH_LONG).show();
+			returnValue = 0;
 		}
 		return returnValue;
 	}
-	
+
 	/**
 	 * it gets the directory path where the files will be located.This will be /$EXTERNAL_STORAGE/SWADroid/courseCode shortName Course. This directory is created in case it does not exist
 	 * */
@@ -443,29 +454,29 @@ public class DownloadsManager extends MenuActivity {
 			if(courseDir.exists()){
 				path = courseDirName;
 			}else if(courseDir.mkdirs())
-					path = courseDirName;
-				
-			
+				path = courseDirName;
+
+
 			/*if(courseDir.exists()){
 				path = courseDirName;
 			}else {
 				File mainDir = new File(swadroidDirName);
 				if(!mainDir.exists()){
-					
+
 				}
 			}
-			
-			
+
+
 			File mainDir = new File(swadroidDirName);
 			boolean mainDirB = mainDir.exists();
-			
+
 			if(!mainDirB){
 				boolean mainDirCreated = mainDir.mkdir();
 			//if(!mainDir.exists()){
 				if(mainDirCreated){
 				//if(mainDir.mkdir()){
 					String courseDirName = swadroidDirName +
-					
+
 					if(!courseDir.exists())
 						if(courseDir.mkdir())
 							path = new String(courseDirName);
@@ -474,7 +485,7 @@ public class DownloadsManager extends MenuActivity {
 		}
 		return path;
 	}
-	
+
 	private void createNotification(String directory, String url){
 		if(downloadsAreaCode == Global.DOCUMENTS_AREA_CODE)
 			new FileDownloaderAsyncTask(getApplicationContext(),false).execute(directory,url);

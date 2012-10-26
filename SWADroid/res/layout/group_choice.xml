@@ -2,7 +2,8 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical" 
+    android:background="@color/background">
      <include layout="@layout/action_bar"/>    
  
 	<TextView
@@ -19,10 +20,12 @@
     <include android:id="@+id/courseNameLayout" layout="@layout/course_or_group_name"/>
    
     <ExpandableListView
-        android:id="@+id/android:list"
+        android:id="@+id/expandableListGroups"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:cacheColorHint="@color/background" >
+        android:cacheColorHint="@color/background"
+        android:background="@color/background" 
+	 >
     </ExpandableListView>   
 
 </LinearLayout>

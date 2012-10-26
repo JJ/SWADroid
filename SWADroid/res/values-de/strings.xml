@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <resources>
+
     <string name="app_name">SWADroid</string>
     <string name="serverName_preferences">Server</string>
     <string name="serverSummary_preferences">Server (ohne http://)</string>
@@ -33,7 +34,7 @@
 		\nprogrammiert bei
 		Juan Miguel Boyero Corral		
 		\nHelena Rodríguez Gijón		
-		\nAntonio Aguilera Malagónl</string>
+		\nAntonio Aguilera Malagón</string>
     <string name="organization_preferences">Universität Granada</string>
     <string name="loginTitle_menu">anmelden</string>
     <string name="loginProgressTitle">anmelden</string>
@@ -87,16 +88,14 @@
     <string name="testTagsMsg">Wählen Sie die Tags in den Test einbezogen werden</string>
     <string name="testNoTagsSelectedMsg">Es muss mindestens ein Tag ausgewählt werde</string>
     <string name="testAnswerTypesMsg">Wählen Sie die Antwort-Typen, die in den Test einbezogen werden</string>
-    <string name="testNoAnswerTypesSelectedMsg">	
-Es muss mindestens ein Antworttyp ausgewählt werden</string>
+    <string name="testNoAnswerTypesSelectedMsg">Es muss mindestens ein Antworttyp ausgewählt werden</string>
     <string name="testEvaluateMsg">bewerten</string>
     <string name="testResultsTextMsg">Ergebnis</string>
     <string name="testShowResultsMsg">Zeige Summen</string>
     <string name="testShowResultsDetailsMsg">Details anzeigen</string>
     <string name="testNoDetailsMsg">Der Lehrer erlaubt es nicht, die Details zu sehen</string>
     <string name="testNoResultsMsg">Der Lehrer erlaubt es nicht, die Ergebnisse zu sehen</string>
-    <string name="firstRunMsg">Bevor Sie die Anwendung zum ersten Mal müssen Sie den Benutzernamen und das Kennwort für SWAD geben Sie auf der Setup-Bildschirm.\n\nSie können auf die Setup-Bildschirm aus dem Men� jederzeit Zugriff.\n\nWollen Sie das Konfigurationsfenster jetzt öffnen?
-	</string>
+    <string name="firstRunMsg">Bevor Sie die Anwendung zum ersten Mal müssen Sie den Benutzernamen und das Kennwort für SWAD geben Sie auf der Setup-Bildschirm.\n\nSie können auf die Setup-Bildschirm aus dem Men� jederzeit Zugriff.\n\nWollen Sie das Konfigurationsfenster jetzt öffnen?</string>
     <string name="initialDialogTitle">WICHTIG</string>
     <string name="upgradeMsg">Aufgrund von �nderungen in der Datenbank alle Testfragen Daten wurden gel�scht.\n\nBitte.</string>
     <string name="errorBadLoginMsg">Falscher Benutzer oder das Passwort</string>
@@ -149,4 +148,9 @@ Es muss mindestens ein Antworttyp ausgewählt werden</string>
     <string name="myGroupsModuleLabel">Meine Gruppen</string>
     <string name="group">Gruppe</string>
     <string name="groupSeparator">: </string>
+    <string name="groupTypesModuleLabel">Schaffen Gruppetypen</string>
+    <string name="sendMyGroupsProgressDescription">Schicken gerade Einschreibung in Gruppen</string>
+    <string name="sendMyGroupsProgressTitle">Einschreibung in Gruppen</string>
+    <string name="openingTime">Öffnungsdatum den Gruppen: </string>
+
 </resources>

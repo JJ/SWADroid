@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+
     <string name="app_name">SWADroid</string>
     <string name="serverName_preferences">Servidor</string>
     <string name="serverSummary_preferences">Servidor (sin http://)</string>
@@ -136,7 +137,7 @@
     <string name="mailingListTitle">Lista de correo</string>
     <string name="blogTitle">Blog</string>
     <string name="marketTitle">Android Market</string>
-    <string name="notificationsAlertTitle">Nuevas notificaciones</string>
+    <string name="notificationsAlertTitle">SWADroid</string>
     <string name="notificationsAlertMsg">nuevas notificaciones</string>
     <string name="footMessageMsg">Enviado desde</string>
     <string name="marksMsg">Pulse sobre la notificación para ver la calificación.</string>
@@ -244,4 +245,9 @@ Seleccione: Sesiones de prácticas - Nueva</string>
     <string name="rollcallEvent">Evento de pasar lista</string>
     <string name="froyoFunctionMsg">Esta función requiere Android 2.2 o superior</string>
     <string name="groupSeparator">: </string>
+    <string name="groupTypesModuleLabel">Conseguir tipos de grupo</string>
+    <string name="sendMyGroupsProgressDescription">Enviando inscripción a grupos</string>
+    <string name="sendMyGroupsProgressTitle">Inscripción en grupos</string>
+    <string name="openingTime">Apertura de grupos: </string>
+
 </resources>

@@ -85,7 +85,7 @@ public class DirectoryNavigator
      */
     public ArrayList<DirectoryItem> goToParentDirectory() throws InvalidPath
     {
-    	ArrayList<DirectoryItem> itemsToShow;
+    	//ArrayList<DirectoryItem> itemsToShow;
     	
     	if(path.size() !=0){
 	        //We decrease the path.
@@ -93,8 +93,8 @@ public class DirectoryNavigator
 	        Node node = goToDirectory();
 	        //itemsToShow = new ArrayList<DirectoryItem>(getItems(node));
 	        currentItems = new ArrayList<DirectoryItem>(getItems(node));
-    	}else
-    		itemsToShow = goToRoot();
+    	}/*else
+    		itemsToShow = goToRoot();*/
     		//currentItems = goToRoot();
     		
         //return itemsToShow;

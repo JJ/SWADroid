@@ -94,7 +94,6 @@ public class RollcallConfigDownload extends Module {
 	protected void requestService() throws NoSuchAlgorithmException, IOException, XmlPullParserException, SoapFault,
 	IllegalAccessException, InstantiationException {
 		int userRole = Global.STUDENT_TYPE_CODE;
-		String empty = "anyType{}";
 
 		// Get groupCode
 		long groupCode = getIntent().getLongExtra("groupCode", 0);
@@ -123,11 +122,11 @@ public class RollcallConfigDownload extends Module {
 				String userFirstName = pii.getProperty("userFirstname").toString();
 				String userPhoto = pii.getProperty("userPhoto").toString();
 
-				if (userNickname.equals(empty)) userNickname = null;
-				if (userSurname1.equals(empty)) userSurname1 = null;
-				if (userSurname2.equals(empty)) userSurname2 = null;
-				if (userFirstName.equals(empty)) userFirstName = null;
-				if (userPhoto.equals(empty)) userPhoto = null;
+				if (userNickname.equalsIgnoreCase(Global.NULL_VALUE)) userNickname = null;
+				if (userSurname1.equalsIgnoreCase(Global.NULL_VALUE)) userSurname1 = null;
+				if (userSurname2.equalsIgnoreCase(Global.NULL_VALUE)) userSurname2 = null;
+				if (userFirstName.equalsIgnoreCase(Global.NULL_VALUE)) userFirstName = null;
+				if (userPhoto.equalsIgnoreCase(Global.NULL_VALUE)) userPhoto = null;
 
 				User u = new User(
 						userCode,					// id

@@ -4,12 +4,10 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 import org.ksoap2.SoapFault;
-import org.ksoap2.serialization.SoapObject;
 import org.xmlpull.v1.XmlPullParserException;
 
 import android.os.Bundle;
 import android.util.Log;
-
 import es.ugr.swad.swadroid.Global;
 import es.ugr.swad.swadroid.modules.Module;
 
@@ -20,21 +18,21 @@ import es.ugr.swad.swadroid.modules.Module;
  * 	- wskey: code to identify the current session
  *  - fileCode: code to identify the downloaded file
  * Returns: Nothing 
- * @author Helena Rodríguez Gijón <hrgijon@gmail.com>
+ * @author Helena Rodriguez Gijon <hrgijon@gmail.com>
  * */
 
 public class NotifyDownload extends Module {
 
-	private int fileCode = -1;
-	
+//	private int fileCode = -1;
+
 	@Override
 	protected void requestService() throws NoSuchAlgorithmException,
-			IOException, XmlPullParserException, SoapFault,
-			IllegalAccessException, InstantiationException {
+	IOException, XmlPullParserException, SoapFault,
+	IllegalAccessException, InstantiationException {
 		createRequest();
 		addParam("wsKey", Global.getLoggedUser().getWsKey());
 		sendRequest(Integer.class,true);
-		
+
 		//TODO podríamos utilizar una confirmación para en caso de negativa, notificar de nuevo.
 		/*if(result != null){
 			SoapObject soapObject = (SoapObject) result;
@@ -62,7 +60,7 @@ public class NotifyDownload extends Module {
 		// TODO Auto-generated method stub
 
 	}
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -71,7 +69,7 @@ public class NotifyDownload extends Module {
 	@Override
 	protected void onStart() {
 		super.onStart();
-		fileCode = getIntent().getIntExtra("fileCode", -1); 
+//		fileCode = getIntent().getIntExtra("fileCode", -1); 
 		runConnection();
 		if(!isConnected){
 			setResult(RESULT_CANCELED);

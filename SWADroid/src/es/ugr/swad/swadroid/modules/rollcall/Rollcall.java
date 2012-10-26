@@ -315,7 +315,7 @@ public class Rollcall extends MenuExpandableListActivity {
 		TextView text = (TextView) this.findViewById(R.id.moduleName);
 		text.setText(R.string.rollcallModuleLabel);
 
-		listCourses = dbHelper.getAllRows(Global.DB_TABLE_COURSES, "userRole = 3", "shortName");
+		listCourses = dbHelper.getAllRows(Global.DB_TABLE_COURSES, "userRole = 3", "fullName");
 
 		// Update rollcall course
 		long courseCode = Global.getSelectedCourseCode();
@@ -351,13 +351,13 @@ public class Rollcall extends MenuExpandableListActivity {
 
 	private void createSpinnerAdapter() {
 		Spinner spinner = (Spinner) this.findViewById(R.id.spCourse);
-		dbCursor =  dbHelper.getDb().getCursor(Global.DB_TABLE_COURSES, "userRole = 3", "shortName");
+		dbCursor =  dbHelper.getDb().getCursor(Global.DB_TABLE_COURSES, "userRole = 3", "fullName");
 		startManagingCursor(dbCursor);	
 
 		SimpleCursorAdapter adapter = new SimpleCursorAdapter (this,
 				android.R.layout.simple_spinner_item, 
 				dbCursor, 
-				new String[] { "shortName" }, 
+				new String[] { "fullName" }, 
 				new int[] { android.R.id.text1 });
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinner.setAdapter(adapter);

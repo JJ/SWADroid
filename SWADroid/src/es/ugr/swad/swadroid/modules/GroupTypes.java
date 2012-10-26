@@ -14,13 +14,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-
 import es.ugr.swad.swadroid.Global;
 import es.ugr.swad.swadroid.R;
-import es.ugr.swad.swadroid.model.Group;
 import es.ugr.swad.swadroid.model.GroupType;
 import es.ugr.swad.swadroid.model.Model;
-import es.ugr.swad.swadroid.modules.Module.Connect;
 /**
  * Group type module to get the group types of a given course
  * and stores them in the database
@@ -74,36 +71,37 @@ public class GroupTypes extends Module {
 	}
 	@Override
 	protected void requestService() throws NoSuchAlgorithmException,
-			IOException, XmlPullParserException, SoapFault,
-			IllegalAccessException, InstantiationException {
+	IOException, XmlPullParserException, SoapFault,
+	IllegalAccessException, InstantiationException {
 		createRequest();
 		addParam("wsKey", Global.getLoggedUser().getWsKey());
 		addParam("courseCode", (int)Global.getSelectedCourseCode());
 		sendRequest(GroupTypes.class,false);
-		
+
 		if(result != null){
 			//Stores groups data returned by webservice response
 			List<Model> groupsSWAD = new ArrayList<Model>();
-			
+
 			Vector<?> res = (Vector <?>) result;
 			SoapObject soap = (SoapObject) res.get(1);	
 			int csSize = soap.getPropertyCount();
-			
+
 			for (int i = 0; i < csSize; i++) {
 				SoapObject pii = (SoapObject)soap.getProperty(i);
 				long id = Long.parseLong(pii.getProperty("groupTypeCode").toString());
 				String groupTypeName = pii.getProperty("groupTypeName").toString();
 				int mandatory = Integer.parseInt(pii.getProperty("mandatory").toString());
 				int multiple = Integer.parseInt(pii.getProperty("multiple").toString());
-				GroupType g = new GroupType(id,groupTypeName,courseCode,mandatory,multiple);
-				
+				long openTime = Long.parseLong(pii.getProperty("openTime").toString());
+				GroupType g = new GroupType(id,groupTypeName,courseCode,mandatory,multiple,openTime);
+
 				groupsSWAD.add(g);
-				
+
 				if(isDebuggable){
 					Log.i(TAG, g.toString());
-	    		}
+				}
 			}
-	
+
 			//TODO remove obsolete groups
 			for(int i = 0; i < groupsSWAD.size(); ++i){
 				GroupType g = (GroupType) groupsSWAD.get(i);
@@ -117,7 +115,7 @@ public class GroupTypes extends Module {
 			setResult(RESULT_OK);
 		}
 	}
-	
+
 
 	@Override
 	protected void connect() {
@@ -129,8 +127,7 @@ public class GroupTypes extends Module {
 
 	@Override
 	protected void postConnect() {
-		// TODO Auto-generated method stub
-
+		finish();
 	}
 
 	@Override

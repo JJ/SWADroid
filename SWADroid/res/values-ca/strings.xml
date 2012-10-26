@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <resources>
+
     <string name="app_name">SWADroid</string>
     <string name="loginModuleLabel">Connectar</string>
     <string name="notificationsModuleLabel">Notificacions</string>
@@ -115,4 +116,6 @@
     <string name="enrollment">Inscripció</string>
     <string name="myGroupsModuleLabel">Els meus grups</string>
     <string name="groupSeparator">: </string>
+    <string name="openingTime">Obertura de grups: </string>
+
 </resources>

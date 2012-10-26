@@ -20,19 +20,17 @@ package es.ugr.swad.swadroid.modules.notifications;
 
 import java.util.Date;
 
-import es.ugr.swad.swadroid.R;
-import es.ugr.swad.swadroid.modules.Messages;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import es.ugr.swad.swadroid.Global;
+import es.ugr.swad.swadroid.R;
 
 /**
  * Custom adapter for display notifications
@@ -42,7 +40,7 @@ import android.widget.TextView;
 public class NotificationsCursorAdapter extends CursorAdapter {
 	private boolean [] contentVisible;
 	Context ctx;
-	
+
 	/**
 	 * Constructor
 	 * @param context Application context
@@ -50,7 +48,7 @@ public class NotificationsCursorAdapter extends CursorAdapter {
 	 */
 	public NotificationsCursorAdapter(Context context, Cursor c) {
 		super(context, c, true);
-		
+
 		ctx = context;
 		int numRows = c.getCount();
 
@@ -68,40 +66,42 @@ public class NotificationsCursorAdapter extends CursorAdapter {
 	 */
 	public NotificationsCursorAdapter(Context context, Cursor c,
 			boolean autoRequery) {
-		
+
 		super(context, c, autoRequery);
 	}
 
 	@Override
 	public void bindView(View view, Context context, Cursor cursor) {
-		final Context ctx = context;
+//		final Context ctx = context;
 		final Long notificationCode = cursor.getLong(cursor.getColumnIndex("id"));
+		final String userPhoto = cursor.getString(cursor.getColumnIndex("userPhoto"));
 		long unixTime;
 		String type = "";
 		String sender, senderFirstname, senderSurname1, senderSurname2, summaryText;
 		String contentText, contentMsgText;
-    	Date d;
-    	java.text.DateFormat dateShortFormat = android.text.format.DateFormat.getDateFormat(context);
-    	java.text.DateFormat timeFormat = android.text.format.DateFormat.getTimeFormat(context);
-    	int numRows = cursor.getCount();
-    	
-    	if(contentVisible.length == 0) {
-    		contentVisible = new boolean[numRows];
-    	}
-    	
-    	view.setScrollContainer(false);
-    	TextView eventCode = (TextView) view.findViewById(R.id.eventCode);
-        TextView eventType = (TextView) view.findViewById(R.id.eventType);
-        TextView eventDate = (TextView) view.findViewById(R.id.eventDate);
-        TextView eventTime = (TextView) view.findViewById(R.id.eventTime);
-        TextView eventSender = (TextView) view.findViewById(R.id.eventSender);
-        TextView location = (TextView) view.findViewById(R.id.eventLocation);
-        final TextView summary = (TextView) view.findViewById(R.id.eventSummary);
-        TextView content = (TextView) view.findViewById(R.id.eventText);
-        TextView contentMsg = (TextView) view.findViewById(R.id.eventMsg);
-        ImageView notificationIcon = (ImageView) view.findViewById(R.id.notificationIcon);
-        ImageView messageReplyButton = (ImageView) view.findViewById(R.id.messageReplyButton);
-        
+		Date d;
+		java.text.DateFormat dateShortFormat = android.text.format.DateFormat.getDateFormat(context);
+		java.text.DateFormat timeFormat = android.text.format.DateFormat.getTimeFormat(context);
+		int numRows = cursor.getCount();
+
+		if(contentVisible.length == 0) {
+			contentVisible = new boolean[numRows];
+		}
+
+		view.setScrollContainer(false);
+		TextView eventCode = (TextView) view.findViewById(R.id.eventCode);
+		TextView eventUserPhoto = (TextView) view.findViewById(R.id.eventUserPhoto);
+		TextView eventType = (TextView) view.findViewById(R.id.eventType);
+		TextView eventDate = (TextView) view.findViewById(R.id.eventDate);
+		TextView eventTime = (TextView) view.findViewById(R.id.eventTime);
+		TextView eventSender = (TextView) view.findViewById(R.id.eventSender);
+		TextView location = (TextView) view.findViewById(R.id.eventLocation);
+		final TextView summary = (TextView) view.findViewById(R.id.eventSummary);
+		TextView content = (TextView) view.findViewById(R.id.eventText);
+		TextView contentMsg = (TextView) view.findViewById(R.id.eventMsg);
+		ImageView notificationIcon = (ImageView) view.findViewById(R.id.notificationIcon);
+		//ImageView messageReplyButton = (ImageView) view.findViewById(R.id.messageReplyButton);
+		/*
         OnClickListener replyMessageListener = new OnClickListener() {
 			public void onClick(View v) {				
 				Intent activity = new Intent(ctx.getApplicationContext(), Messages.class);
@@ -109,116 +109,117 @@ public class NotificationsCursorAdapter extends CursorAdapter {
 				activity.putExtra("summary", summary.getText().toString());
 				ctx.startActivity(activity);
 			}        	
-        };
-        
-        if(eventType != null) {
-        	eventCode.setText(notificationCode.toString());
-        	type = cursor.getString(cursor.getColumnIndex("eventType"));
-        	messageReplyButton.setVisibility(View.GONE);
-        	
-        	if(type.equals("examAnnouncement"))
-        	{
-        		type = context.getString(R.string.examAnnouncement);
-        		notificationIcon.setImageResource(R.drawable.announce);
-        	} else if(type.equals("marksFile"))
-        	{
-        		type = context.getString(R.string.marksFile);
-        		notificationIcon.setImageResource(R.drawable.grades);
-        	} else if(type.equals("notice"))
-        	{
-        		type = context.getString(R.string.notice);
-        		notificationIcon.setImageResource(R.drawable.note);
-        	} else if(type.equals("message"))
-        	{
-        		type = context.getString(R.string.message);
-        		notificationIcon.setImageResource(R.drawable.msg_received);
-        		messageReplyButton.setOnClickListener(replyMessageListener);
-        		messageReplyButton.setVisibility(View.VISIBLE);
-        	} else if(type.equals("forumReply"))
-        	{
-        		type = context.getString(R.string.forumReply);
-        		notificationIcon.setImageResource(R.drawable.forum);
-        	} else if(type.equals("assignment"))
-        	{
-        		type = context.getString(R.string.assignment);
-        		notificationIcon.setImageResource(R.drawable.desk);
-        	} else if(type.equals("survey"))
-        	{
-        		type = context.getString(R.string.survey);
-        		notificationIcon.setImageResource(R.drawable.survey);
-        	} else {
-        		type = context.getString(R.string.unknownNotification);
-        		notificationIcon.setImageResource(R.drawable.ic_launcher_swadroid);
-        	}
-        	
-        	eventType.setText(type);
-        }
-        if((eventDate != null) && (eventTime != null)){
-        	unixTime = Long.parseLong(cursor.getString(cursor.getColumnIndex("eventTime")));
-        	d = new Date(unixTime * 1000);
-        	eventDate.setText(dateShortFormat.format(d));
-        	eventTime.setText(timeFormat.format(d));
-        }
-        if(eventSender != null){
-        	sender = "";
-        	senderFirstname = cursor.getString(cursor.getColumnIndex("userFirstname"));
-        	senderSurname1 = cursor.getString(cursor.getColumnIndex("userSurname1"));
-        	senderSurname2 = cursor.getString(cursor.getColumnIndex("userSurname2"));
-        	
-        	//Empty fields checking
-        	if(!senderFirstname.equals("anyType{}"))
-        		sender += senderFirstname + " ";
-        	if(!senderSurname1.equals("anyType{}"))
-        		sender += senderSurname1 + " ";
-        	if(!senderSurname2.equals("anyType{}"))
-        		sender += senderSurname2;
-        	
-        	eventSender.setText(sender);
-        }
-        if(location != null) {
-        	location.setText(Html.fromHtml(cursor.getString(cursor.getColumnIndex("location"))));
-        }
-        if(summary != null){   
-        	summaryText = cursor.getString(cursor.getColumnIndex("summary"));
-        	
-        	//Empty field checking
-        	if(summaryText.equals("anyType{}"))
-        		summaryText = context.getString(R.string.noSubjectMsg);
-        	
-        	summary.setText(Html.fromHtml(summaryText));
-        }
-        if((content != null)){
-        	contentText = cursor.getString(cursor.getColumnIndex("content"));
-        	
-        	//Empty field checking
-        	if(contentText.equals("anyType{}"))
-        		contentText = context.getString(R.string.noContentMsg);
-        	
-    		content.setText(contentText);
-        	
-        	if(type.equals(context.getString(R.string.marksFile))) {
-        		contentMsgText = context.getString(R.string.marksMsg);
-        		contentMsg.setText(contentMsgText);
-        		contentVisible[cursor.getPosition()] = true;
-        	} else {
-        		contentMsgText = "";
-    			contentMsg.setText(contentMsgText);
-        		contentVisible[cursor.getPosition()] = false;
-        	}
-        	
-        	if(contentVisible[cursor.getPosition()]) {
-        		contentMsg.setVisibility(View.VISIBLE);
-        	} else {
-        		contentMsg.setVisibility(View.GONE);
-        	}
-        }
+        };*/
+
+		if(eventType != null) {
+			eventCode.setText(notificationCode.toString());
+			eventUserPhoto.setText(userPhoto);
+			type = cursor.getString(cursor.getColumnIndex("eventType"));
+			//messageReplyButton.setVisibility(View.GONE);
+
+			if(type.equals("examAnnouncement"))
+			{
+				type = context.getString(R.string.examAnnouncement);
+				notificationIcon.setImageResource(R.drawable.announce);
+			} else if(type.equals("marksFile"))
+			{
+				type = context.getString(R.string.marksFile);
+				notificationIcon.setImageResource(R.drawable.grades);
+			} else if(type.equals("notice"))
+			{
+				type = context.getString(R.string.notice);
+				notificationIcon.setImageResource(R.drawable.note);
+			} else if(type.equals("message"))
+			{
+				type = context.getString(R.string.message);
+				notificationIcon.setImageResource(R.drawable.msg_received);
+				//messageReplyButton.setOnClickListener(replyMessageListener);
+				//messageReplyButton.setVisibility(View.VISIBLE);
+			} else if(type.equals("forumReply"))
+			{
+				type = context.getString(R.string.forumReply);
+				notificationIcon.setImageResource(R.drawable.forum);
+			} else if(type.equals("assignment"))
+			{
+				type = context.getString(R.string.assignment);
+				notificationIcon.setImageResource(R.drawable.desk);
+			} else if(type.equals("survey"))
+			{
+				type = context.getString(R.string.survey);
+				notificationIcon.setImageResource(R.drawable.survey);
+			} else {
+				type = context.getString(R.string.unknownNotification);
+				notificationIcon.setImageResource(R.drawable.ic_launcher_swadroid);
+			}
+
+			eventType.setText(type);
+		}
+		if((eventDate != null) && (eventTime != null)){
+			unixTime = Long.parseLong(cursor.getString(cursor.getColumnIndex("eventTime")));
+			d = new Date(unixTime * 1000);
+			eventDate.setText(dateShortFormat.format(d));
+			eventTime.setText(timeFormat.format(d));
+		}
+		if(eventSender != null){
+			sender = "";
+			senderFirstname = cursor.getString(cursor.getColumnIndex("userFirstname"));
+			senderSurname1 = cursor.getString(cursor.getColumnIndex("userSurname1"));
+			senderSurname2 = cursor.getString(cursor.getColumnIndex("userSurname2"));
+
+			//Empty fields checking
+			if(!senderFirstname.equals(Global.NULL_VALUE))
+				sender += senderFirstname + " ";
+			if(!senderSurname1.equals(Global.NULL_VALUE))
+				sender += senderSurname1 + " ";
+			if(!senderSurname2.equals(Global.NULL_VALUE))
+				sender += senderSurname2;
+
+			eventSender.setText(sender);
+		}
+		if(location != null) {
+			location.setText(Html.fromHtml(cursor.getString(cursor.getColumnIndex("location"))));
+		}
+		if(summary != null){   
+			summaryText = cursor.getString(cursor.getColumnIndex("summary"));
+
+			//Empty field checking
+			if(summaryText.equals(Global.NULL_VALUE))
+				summaryText = context.getString(R.string.noSubjectMsg);
+
+			summary.setText(Html.fromHtml(summaryText));
+		}
+		if((content != null)){
+			contentText = cursor.getString(cursor.getColumnIndex("content"));
+
+			//Empty field checking
+			if(contentText.equals(Global.NULL_VALUE))
+				contentText = context.getString(R.string.noContentMsg);
+
+			content.setText(contentText);
+
+			if(type.equals(context.getString(R.string.marksFile))) {
+				contentMsgText = context.getString(R.string.marksMsg);
+				contentMsg.setText(contentMsgText);
+				contentVisible[cursor.getPosition()] = true;
+			} else {
+				contentMsgText = "";
+				contentMsg.setText(contentMsgText);
+				contentVisible[cursor.getPosition()] = false;
+			}
+
+			if(contentVisible[cursor.getPosition()]) {
+				contentMsg.setVisibility(View.VISIBLE);
+			} else {
+				contentMsg.setVisibility(View.GONE);
+			}
+		}
 	}
 
 	@Override
 	public View newView(Context context, Cursor cursor, ViewGroup parent) {	
 		LayoutInflater vi = LayoutInflater.from(context);
 		View v = vi.inflate(R.layout.notifications_list_item, parent, false);
-		
+
 		return v;
 	}
 
@@ -232,7 +233,7 @@ public class NotificationsCursorAdapter extends CursorAdapter {
 		View view = this.getView(position, null, null);
 		TextView eventType = (TextView) view.findViewById(R.id.eventType);
 		TextView content = (TextView) view.findViewById(R.id.eventText);
-		
+
 		viewType = String.valueOf(eventType.getText());
 		marksType = ctx.getString(R.string.marksFile);
 

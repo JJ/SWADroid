@@ -20,8 +20,6 @@ package es.ugr.swad.swadroid.modules.tests;
 
 import java.util.List;
 
-import es.ugr.swad.swadroid.R;
-import es.ugr.swad.swadroid.model.TestAnswer;
 import android.content.Context;
 import android.graphics.Color;
 import android.text.Html;
@@ -32,6 +30,8 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckedTextView;
 import android.widget.ListView;
+import es.ugr.swad.swadroid.R;
+import es.ugr.swad.swadroid.model.TestAnswer;
 
 public class CheckedAnswersArrayAdapter extends ArrayAdapter<TestAnswer> {
 	private Context context;
@@ -40,10 +40,10 @@ public class CheckedAnswersArrayAdapter extends ArrayAdapter<TestAnswer> {
 	private boolean evaluated;
 	private String feedback;
 	private String answerType;
-	
+
 	public CheckedAnswersArrayAdapter(Context context, int textViewResourceId,
 			List<TestAnswer> objects, boolean eval, String feedb, String anstype) {
-		
+
 		super(context, textViewResourceId, objects);
 		this.context = context;
 		this.textViewResourceId = textViewResourceId;
@@ -62,12 +62,12 @@ public class CheckedAnswersArrayAdapter extends ArrayAdapter<TestAnswer> {
 		final ListView lv = (ListView) parent;
 		final int rbPosition = position;
 		TestAnswer a = items.get(position);
-        
+
 		if (convertView == null) {
-             LayoutInflater vi = LayoutInflater.from(context);
-             convertView = vi.inflate(textViewResourceId, null);
-        }
-		 
+			LayoutInflater vi = LayoutInflater.from(context);
+			convertView = vi.inflate(textViewResourceId, null);
+		}
+
 		tt = (CheckedTextView) convertView.findViewById(android.R.id.text1);
 		if(answerType.equals("TF")) {
 			if(a.getAnswer().equals("T")) {
@@ -78,33 +78,33 @@ public class CheckedAnswersArrayAdapter extends ArrayAdapter<TestAnswer> {
 		} else {
 			tt.setText(Html.fromHtml(a.getAnswer()));
 		}
-		
+
 		if(lv.getChoiceMode() == ListView.CHOICE_MODE_SINGLE) {
 			tt.setOnClickListener(new OnClickListener() {				
 				public void onClick(View v) {
 					CheckedTextView rb = (CheckedTextView) v;					
 					int childCount = lv.getCount();
 					boolean checked = rb.isChecked();
-					
+
 					for(int i=0; i<childCount; i++) {
 						lv.setItemChecked(i, false);
 					}
-					
+
 					lv.setItemChecked(rbPosition, !checked);
 				}
 			});			
 		}
-		
+
 		if(evaluated) {
 			tt.setOnClickListener(null);
-			
+
 			if(feedback.equals("eachGoodBad") && a.getCorrect()) {
 				tt.setTextColor(context.getResources().getColor(R.color.green));
 			} else {
 				tt.setTextColor(Color.BLACK);
 			}
 		}
-         
-        return convertView;
+
+		return convertView;
 	}
 }

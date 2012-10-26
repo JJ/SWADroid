@@ -15,8 +15,10 @@
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
- 
-    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
 
     <uses-sdk
         android:minSdkVersion="7"
@@ -28,8 +30,8 @@
         android:largeScreens="true"
         android:normalScreens="true"
         android:resizeable="true"
-        android:smallScreens="true" >
-        <!-- android:xlargeScreens="true" > -->
+        android:smallScreens="true"
+        android:xlargeScreens="true" >
     </supports-screens>
 
     <application
@@ -158,8 +160,7 @@
             android:configChanges="keyboard|keyboardHidden|orientation"
             android:label="@string/noticesModuleLabel"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" >
-        </activity>        
-        
+        </activity>
         <activity
             android:name=".sync.AccountAuthenticator"
             android:configChanges="keyboard|keyboardHidden|orientation"
@@ -178,6 +179,16 @@
         <activity
             android:name=".modules.groups.MyGroupsManager"
             android:label="@string/myGroupsModuleLabel"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        <activity
+            android:name=".modules.GroupTypes"
+            android:label="@string/groupTypesModuleLabel"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
+        <activity
+            android:name=".modules.groups.SendMyGroups"
+            android:label="@string/sendMyGroupsProgressTitle"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
 
